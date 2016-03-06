@@ -1,0 +1,8 @@
+---
+- name: Install nginx for RHEL
+  yum: name=nginx state=present
+  when: ansible_pkg_mgr == "yum"
+
+- name: Install nginx for Debian
+  apt: name=nginx state=present
+  when: ansible_pkg_mgr == "apt"
