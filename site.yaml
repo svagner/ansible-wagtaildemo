@@ -4,6 +4,7 @@
   vars:
     project_name: wagtaildemo
     project_root: /work/project/{{ project_name }}
+    django_settings_module: "{{ project_name }}.settings.dev"
 
   roles:
     - common
