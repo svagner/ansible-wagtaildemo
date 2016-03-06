@@ -1,0 +1,8 @@
+python_packages:
+- virtualenv
+- virtualenvwrapper
+- stevedore
+- virtualenv-clone
+- pillow
+
+virtualenv_path: "{{ project_root }}/env"
