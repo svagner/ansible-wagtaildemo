@@ -57,3 +57,13 @@
   when: deployed_flag.stat.exists == False
 
 - file: path="{{project_root}}/deployed.flag" state=touch mode=0644
+
+- name: write the nginx config file
+  template: src=nginx.conf dest=/etc/nginx/sites-available/default
+  notify:
+    - reload nginx
+
+- name: write the supervisor config file
+  template: src=supervisor.conf dest=/etc/supervisor/conf.d/wagtaildemo.conf
+  notify:
+    - reload supervisor 
