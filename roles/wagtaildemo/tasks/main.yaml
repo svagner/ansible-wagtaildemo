@@ -9,9 +9,16 @@
   with_items:
     python_packages
 
+- stat: path="{{virtualenv_path}}"
+  register: venv_path
+
+- stat: path="{{project_root}}/deployed.flag"
+  register: deployed_flag
+
 - name: Create virtualenv
   command: virtualenv {{ virtualenv_path }}
   ignore_errors: true
+  when: venv_path.stat.exists == False
 
 - name: Install requirements
   shell: >
@@ -33,15 +40,20 @@
                  virtualenv={{ virtualenv_path }}
   sudo: yes
   sudo_user: postgres
+  when: deployed_flag.stat.exists == False
 
 - name: Run manage.py load_initial_data
   django_manage: command="load_initial_data"
                  app_path={{ project_root }}
                  settings={{ django_settings_module }}
                  virtualenv={{ virtualenv_path }}
+  when: deployed_flag.stat.exists == False
 
 - name: Run manage.py createsuperuser
   django_manage: command="createsuperuser"
                  app_path={{ project_root }}
                  settings={{ django_settings_module }}
                  virtualenv={{ virtualenv_path }}
+  when: deployed_flag.stat.exists == False
+
+- file: path="{{project_root}}/deployed.flag" state=touch mode=0644
