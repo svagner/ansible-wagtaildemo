@@ -3,3 +3,45 @@
 - file: path={{project_root}} state=directory mode=0755 owner=root group=root recurse=true
 
 - git: repo=https://github.com/torchbox/wagtaildemo.git dest={{project_root}}
+
+- name: Install required python packages
+  pip: name={{ item }} state=present
+  with_items:
+    python_packages
+
+- name: Create virtualenv
+  command: virtualenv {{ virtualenv_path }}
+  ignore_errors: true
+
+- name: Install requirements
+  shell: >
+      {{ project_root }}/env/bin/pip install
+      -r {{ project_root }}/requirements.txt
+
+- postgresql_db: name=wagtaildemo
+  sudo: yes
+  sudo_user: postgres
+
+- postgresql_user: name=root role_attr_flags=CREATEDB,CREATEROLE,SUPERUSER
+  sudo: yes
+  sudo_user: postgres
+
+- name: Run manage.py migrate
+  django_manage: command="migrate --noinput"
+                 app_path={{ project_root }}
+                 settings={{ django_settings_module }}
+                 virtualenv={{ virtualenv_path }}
+  sudo: yes
+  sudo_user: postgres
+
+- name: Run manage.py load_initial_data
+  django_manage: command="load_initial_data"
+                 app_path={{ project_root }}
+                 settings={{ django_settings_module }}
+                 virtualenv={{ virtualenv_path }}
+
+- name: Run manage.py createsuperuser
+  django_manage: command="createsuperuser"
+                 app_path={{ project_root }}
+                 settings={{ django_settings_module }}
+                 virtualenv={{ virtualenv_path }}
