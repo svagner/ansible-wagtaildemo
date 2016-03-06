@@ -1,0 +1,15 @@
+---
+- name: Install wagtaildemo
+  hosts: wagtaildemo
+  vars:
+    project_name: wagtaildemo
+    project_root: /work/project/{{ project_name }}
+
+  roles:
+    - common
+    - nginx
+    - redis
+    - uwsgi
+    - postgresql
+    - supervisor
+    - wagtaildemo 
